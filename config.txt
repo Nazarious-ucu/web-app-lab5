@@ -1,0 +1,27 @@
+export compact
+/interface list
+add name=WAN
+add name=LAN
+/interface wireless security-profiles
+set [ find default=yes ] supplicant-identity=MikroTik
+/ip pool
+add name=lan-pool ranges=192.168.56.0-192.168.56.254
+add name=dhcp_pool1 ranges=192.168.56.2-192.168.56.254
+/ip dhcp-server
+add address-pool=dhcp_pool1 disabled=no interface=ether2 name=dhcp1
+/dude
+set enabled=yes
+/interface list member
+add interface=ether1 list=WAN
+add interface=ether2 list=LAN
+/ip address
+add address=192.168.56.1/24 interface=ether2 network=192.168.56.0
+add address=10.0.2.1/24 interface=ether1 network=10.0.2.0
+/ip dhcp-client
+add dhcp-options=hostname,clientid disabled=no interface=ether1
+/ip dhcp-server network
+add address=192.168.56.0/24 gateway=192.168.56.1
+/ip firewall nat
+add action=masquerade chain=srcnat out-interface-list=WAN
+/ip route
+add distance=1 dst-address=192.168.100.0/24 gateway=10.0.2.1
